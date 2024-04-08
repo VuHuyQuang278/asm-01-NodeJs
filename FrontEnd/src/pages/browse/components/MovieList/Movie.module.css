@@ -1,0 +1,18 @@
+.img-poster {
+  width: 10rem;
+  height: 15rem;
+  object-fit: cover;
+  transition: 0.5s;
+}
+
+.img-backdrop {
+  width: 15rem;
+  height: 10rem;
+  object-fit: cover;
+  transition: 0.5s;
+}
+
+.img-backdrop:hover,
+.img-poster:hover {
+  transform: scale(1.15);
+}

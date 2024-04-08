@@ -1,0 +1,41 @@
+.movie-detail-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2rem;
+  color: #fff;
+  padding: 2rem 0 1rem 0;
+}
+
+.movie-infor {
+  width: 50%;
+  padding-top: 3rem;
+  padding-left: 2rem;
+}
+
+.title {
+  font-size: x-large;
+  padding-bottom: 1rem;
+}
+
+.release-date {
+  font-size: large;
+  padding: 1rem 0 0.5rem 0;
+}
+
+.vote {
+  font-size: large;
+  padding-bottom: 1rem;
+}
+
+.trailer {
+  width: 50%;
+  padding-right: 2rem;
+  border-radius: 10px;
+}
+
+.bg-img {
+  width: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}

@@ -29,6 +29,7 @@ exports.getTrendingMovies = (req, res, next) => {
   });
 };
 
+// Lấy các phim có Rating cao
 exports.getTopRateMovies = (req, res, next) => {
   // Lấy thứ tự của trang, nếu không có thì pageCurrent = 1
   let pageCurrent = req.query.page;
@@ -54,6 +55,7 @@ exports.getTopRateMovies = (req, res, next) => {
   });
 };
 
+// Lấy các phim theo thể loại
 exports.getMoviesByGenre = (req, res, next) => {
   // Lấy thứ tự của trang, nếu không có thì pageCurrent = 1
   let pageCurrent = req.query.page;
@@ -109,6 +111,7 @@ exports.getMoviesByGenre = (req, res, next) => {
   });
 };
 
+// Lấy trailer của một bộ phim
 exports.getMovieTrailer = (req, res, next) => {
   // Lấy id của phim muốn tìm Trailer
   const film_id = req.body.film_id;
@@ -165,5 +168,39 @@ exports.getMovieTrailer = (req, res, next) => {
         });
       }
     }
+  });
+};
+
+// Tìm kiếm phim theo từ khóa
+exports.Searchmovies = (req, res, next) => {
+  const keyword = req.body.keyword;
+
+  // Nếu người dùng không có param
+  if (!req.body.keyword) {
+    // Trả về status code của respone
+    return res.status(400).send({
+      message: "Not found keyword parram",
+    });
+  }
+
+  Movie.fetchAll((movies) => {
+    // tìm kiếm overview hoặc title có chứa từ khóa, không phân biệt hoa thường
+    const moviesResult = movies.filter(
+      (movie) =>
+        movie.title.toLowerCase().search(keyword.toLowerCase()) !== -1 ||
+        movie.overview.toLowerCase().search(keyword.toLowerCase()) !== -1
+    );
+
+    // Lấy danh sách cách phim thoả mãn và tổng số page dữ liệu có thể lấy
+    const { moviesModified, total_page } = updateData(moviesResult, 1);
+
+    // Trả về dữ liệu
+    res.json({
+      results: moviesModified,
+      page: 1,
+      total_page: total_page,
+    });
+    // Trả về status code của respone
+    res.status(200);
   });
 };

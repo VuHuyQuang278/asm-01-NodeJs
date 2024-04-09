@@ -10,4 +10,6 @@ router.get("/top-rate", movieController.getTopRateMovies);
 
 router.post("/video", movieController.getMovieTrailer);
 
+router.post("/search", movieController.Searchmovies);
+
 module.exports = router;

@@ -8,4 +8,6 @@ router.get("/trending", movieController.getTrendingMovies);
 
 router.get("/top-rate", movieController.getTopRateMovies);
 
+router.post("/video", movieController.getMovieTrailer);
+
 module.exports = router;

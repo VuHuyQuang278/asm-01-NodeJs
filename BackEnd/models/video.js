@@ -16,3 +16,9 @@ const getVideoFromFile = (cb) => {
     }
   });
 };
+
+module.exports = class Video {
+  static fetchAll(cb) {
+    getVideoFromFile(cb);
+  }
+};

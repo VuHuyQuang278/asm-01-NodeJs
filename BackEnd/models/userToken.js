@@ -16,3 +16,9 @@ const getUserTokenFromFile = (cb) => {
     }
   });
 };
+
+module.exports = class UserToken {
+  static fetchAll(cb) {
+    getUserTokenFromFile(cb);
+  }
+};

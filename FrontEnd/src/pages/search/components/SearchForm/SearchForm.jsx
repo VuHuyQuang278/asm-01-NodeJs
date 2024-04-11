@@ -16,7 +16,13 @@ const SearchForm = (props) => {
   const fetchMovie = useCallback(async (movieName) => {
     try {
       const response = await fetch(
-        `https://api.themoviedb.org/3${requests.fetchSearch}&query=${movieName}`
+        `http://localhost:5000/api/movies${requests.fetchSearch}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ keyword: movieName }),
+          mode: "cors",
+        }
       );
 
       if (!response.ok) {

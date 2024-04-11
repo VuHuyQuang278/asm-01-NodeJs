@@ -8,6 +8,8 @@ router.get("/trending", movieController.getTrendingMovies);
 
 router.get("/top-rate", movieController.getTopRateMovies);
 
+router.get("/discover", movieController.getMoviesByGenre);
+
 router.post("/video", movieController.getMovieTrailer);
 
 router.post("/search", movieController.Searchmovies);

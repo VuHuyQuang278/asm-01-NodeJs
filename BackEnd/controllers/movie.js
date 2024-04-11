@@ -65,6 +65,7 @@ exports.getMoviesByGenre = (req, res, next) => {
 
   // Lấy id thể loại phim
   let genre = req.query.genre;
+
   // Nếu không có id thì trả về lỗi
   if (!req.query.genre) {
     // Trả về status code của respone
@@ -75,10 +76,10 @@ exports.getMoviesByGenre = (req, res, next) => {
 
   Genre.fetchAll((genres) => {
     // Tìm thông tin thể loại phim
-    const genreMovie = genres.filter((movie) => movie.id === genre);
+    const genreMovie = genres.filter((movie) => movie.id.toString() === genre);
 
     // Nếu không có thể loại nào thoả mãn thì trả về lỗi
-    if (genreMovie.length < 1) {
+    if (genreMovie.length === 0) {
       // Trả về status code của respone
       return res.status(400).send({
         message: "Not found that gerne id",
@@ -87,13 +88,9 @@ exports.getMoviesByGenre = (req, res, next) => {
 
     Movie.fetchAll((movies) => {
       // Lấy danh sách phim thoả mãn id thể loại yêu cầu
-      const movieList = movies.filter((movie) => {
-        for (let i = 0; i < movie.genre_ids.length; i++) {
-          if (movie.genre_ids[i] === genre) {
-            return true;
-          }
-        }
-      });
+      const movieList = movies.filter((movie) =>
+        movie.genre_ids.includes(genreMovie[0].id)
+      );
 
       // Lấy danh sách cách phim thoả mãn và tổng số page dữ liệu có thể lấy
       const { moviesModified, total_page } = updateData(movieList, pageCurrent);
@@ -127,8 +124,15 @@ exports.getMovieTrailer = (req, res, next) => {
   Video.fetchAll((moviesInfor) => {
     // Tìm kiếm thông tin bộ phim
     const movieInfor = moviesInfor.filter((movie) => movie.id === film_id);
+
+    if (movieInfor.length === 0) {
+      return res.status(404).send({
+        message: "Not found video",
+      });
+    }
+
     // Lấy danh sách videos của bộ phim
-    const movieTrailers = movieInfor.videos;
+    const movieTrailers = movieInfor[0].videos;
 
     // Sắp xếp các video theo trường published_at gần nhất
     movieTrailers.sort((a, b) => {
@@ -140,25 +144,23 @@ exports.getMovieTrailer = (req, res, next) => {
     });
 
     for (let i = 0; i < movieTrailers.length; i++) {
-      // Video phải là official
-      if (movieTrailers[i].official) {
-        // Nguồn video phải là từ YouTube
-        if (movieTrailers[i].site === "YouTube") {
-          // Ưu tiên lấy video về trailer hơn teaser
-          if (movieTrailers[i].type === "Trailer") {
-            // Trả về dữ liệu
-            res.json(movieTrailers[i]);
+      // Lọc video theo tiêu chí
+      if (movieTrailers[i].official && movieTrailers[i].site === "YouTube") {
+        // Ưu tiên lấy video về trailer hơn teaser
+        if (movieTrailers[i].type === "Trailer") {
+          // Trả về dữ liệu
+          return res.status(200).json(movieTrailers[i]);
+        }
+      }
+    }
 
-            // Trả về status code của respone
-            res.status(200);
-            break;
-          } else if (movieTrailers[i].type === "Teaser") {
-            // Trả về dữ liệu
-            res.json(movieTrailers[i]);
-
-            // Trả về status code của respone
-            res.status(200);
-          }
+    for (let i = 0; i < movieTrailers.length; i++) {
+      // Lọc video theo tiêu chí
+      if (movieTrailers[i].official && movieTrailers[i].site === "YouTube") {
+        // Ưu tiên lấy video về trailer hơn teaser
+        if (movieTrailers[i].type === "Teaser") {
+          // Trả về dữ liệu
+          return res.status(200).json(movieTrailers[i]);
         }
         // Nếu không tìm được video phù hợp
       } else {
@@ -173,7 +175,7 @@ exports.getMovieTrailer = (req, res, next) => {
 
 // Tìm kiếm phim theo từ khóa
 exports.Searchmovies = (req, res, next) => {
-  const keyword = req.body.keyword;
+  const keyword = req.body.keyword.toLowerCase();
 
   // Nếu người dùng không có param
   if (!req.body.keyword) {
@@ -185,11 +187,23 @@ exports.Searchmovies = (req, res, next) => {
 
   Movie.fetchAll((movies) => {
     // tìm kiếm overview hoặc title có chứa từ khóa, không phân biệt hoa thường
-    const moviesResult = movies.filter(
-      (movie) =>
-        movie.title.toLowerCase().search(keyword.toLowerCase()) !== -1 ||
-        movie.overview.toLowerCase().search(keyword.toLowerCase()) !== -1
-    );
+    const moviesResult = movies.filter((movie) => {
+      // Nếu tên phim là trường title
+      if (movie.title) {
+        const lowerTitle = movie.title.toLowerCase();
+        const lowerOverview = movie.overview.toLowerCase();
+
+        return lowerTitle.includes(keyword) || lowerOverview.includes(keyword);
+      }
+
+      // Nếu tên phim là trường name
+      if (movie.name) {
+        const lowerTitle = movie.name.toLowerCase();
+        const lowerOverview = movie.overview.toLowerCase();
+
+        return lowerTitle.includes(keyword) || lowerOverview.includes(keyword);
+      }
+    });
 
     // Lấy danh sách cách phim thoả mãn và tổng số page dữ liệu có thể lấy
     const { moviesModified, total_page } = updateData(moviesResult, 1);

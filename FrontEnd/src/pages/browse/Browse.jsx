@@ -25,10 +25,22 @@ function Browse() {
 
   // Nạp dữ liệu các thể loại movie
   const fetchOriginal = useCallback(async () => {
-    const data = await fetchApi(requests.fetchNetflixOriginals);
-    const originalFimls = await data.results;
-    setOriginal(originalFimls);
-    console.log("original", originalFimls);
+    try {
+      // Lấy danh sách các bộ phim
+      const response = await fetch(
+        `https://api.themoviedb.org/3${requests.fetchNetflixOriginals}`
+      );
+      if (!response.ok) {
+        throw new Error("Something went wrong!");
+      }
+      const data = await response.json();
+
+      const originalFimls = await data.results;
+      setOriginal(originalFimls);
+      console.log("original", originalFimls);
+    } catch (error) {
+      console.log(error.message);
+    }
   }, []);
 
   const fetchTrending = useCallback(async () => {

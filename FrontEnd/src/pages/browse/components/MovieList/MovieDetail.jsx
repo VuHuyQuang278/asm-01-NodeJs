@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import classes from "./MovieDetail.module.css";
 
 // Nhập API_Key
-import { API_KEY } from "../../../../api/request";
+import { token, userId } from "../../../../api/request";
 
 // Nhập component YouTube
 import YouTube from "react-youtube";
@@ -17,52 +17,27 @@ const MovieDetail = (props) => {
   // Hàm nạp dữ liệu trailer
   const fetchTrailer = useCallback(async () => {
     const response = await fetch(
-      `https://api.themoviedb.org/3/movie/${props.movie.id}/videos?api_key=${API_KEY}`
+      `http://localhost:5000/api/movies/video?token=${token}&userId=${userId}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ film_id: props.movie.id }),
+        mode: "cors",
+      }
     );
     const results = await response.json();
-    const data = await results.results;
+    console.log(results);
+    setTrailer(results);
 
     let dataMedia;
     // Nếu không nạp được dữ liệu (data = undefined)
-    if (data === undefined) {
+    if (results === undefined) {
       dataMedia = {
         type: "bg",
         key: `https://image.tmdb.org/t/p/original${props.movie.backdrop_path}`,
       };
       setTrailer(dataMedia);
-    } else {
-      // Nếu có dữ liệu trả về
-      if (data.length > 0) {
-        for (let i = 0; i < data.length; i++) {
-          if (data[i].site === "YouTube") {
-            // Ưu tiên lấy video về trailer hơn teaser
-            if (data[i].type === "Trailer") {
-              dataMedia = {
-                type: "video",
-                key: data[i].key,
-              };
-              break;
-            } else if (data[i].type === "Teaser") {
-              if (!dataMedia) {
-                dataMedia = {
-                  type: "video",
-                  key: data[i].key,
-                };
-              }
-            }
-          }
-        }
-
-        setTrailer(dataMedia);
-      }
-      // Nếu không có dữ liệu trả về (data = [])
-      else {
-        dataMedia = {
-          type: "bg",
-          key: `https://image.tmdb.org/t/p/original${props.movie.backdrop_path}`,
-        };
-        setTrailer(dataMedia);
-      }
+      console.log(dataMedia);
     }
   }, [props.movie]);
 
@@ -84,28 +59,19 @@ const MovieDetail = (props) => {
         <p>{props.movie.overview}</p>
       </div>
       <div className={classes.trailer}>
-        {trailer &&
-          (trailer.type === "video" ? (
-            <YouTube
-              className={classes.video}
-              videoId={trailer.key}
-              opts={{
-                height: "400",
-                width: "100%",
-                playerVars: {
-                  autoplay: 0,
-                },
-              }}
-            />
-          ) : (
-            <div>
-              <img
-                src={trailer.key}
-                alt="background movie"
-                className={classes["bg-img"]}
-              />
-            </div>
-          ))}
+        {trailer && (
+          <YouTube
+            className={classes.video}
+            videoId={trailer.key}
+            opts={{
+              height: "400",
+              width: "100%",
+              playerVars: {
+                autoplay: 0,
+              },
+            }}
+          />
+        )}
       </div>
     </div>
   );

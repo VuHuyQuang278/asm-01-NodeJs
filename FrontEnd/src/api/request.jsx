@@ -1,21 +1,23 @@
 export const API_KEY = "9855c5d8697586d195634224cf87eb23";
+export const token = "8qlOkxz4wq";
+export const userId = "User 01";
 
 export const requests = {
-  fetchTrending: `/trending/all/week?api_key=${API_KEY}&language=en-US`,
+  fetchTrending: `/trending?token=${token}&userId=${userId}`,
   fetchNetflixOriginals: `/discover/tv?api_key=${API_KEY}&with_network=123`,
-  fetchTopRated: `/movie/top_rated?api_key=${API_KEY}&language=en-US`,
-  fetchActionMovies: `/discover/movie?api_key=${API_KEY}&with_genres=28`,
-  fetchComedyMovies: `/discover/movie?api_key=${API_KEY}&with_genres=35`,
-  fetchHorrorMovies: `/discover/movie?api_key=${API_KEY}&with_genres=27`,
-  fetchRomanceMovies: `/discover/movie?api_key=${API_KEY}&with_genres=10749`,
-  fetchDocumentaries: `/discover/movie?api_key=${API_KEY}&with_genres=99`,
-  fetchSearch: `/search/movie?api_key=${API_KEY}&language=en-US`,
+  fetchTopRated: `/top-rate/?token=${token}&userId=${userId}`,
+  fetchActionMovies: `/discover?token=${token}&userId=${userId}&genre=28`,
+  fetchComedyMovies: `/discover?token=${token}&userId=${userId}&genre=35`,
+  fetchHorrorMovies: `/discover?token=${token}&userId=${userId}&genre=27`,
+  fetchRomanceMovies: `/discover?token=${token}&userId=${userId}&genre=10749`,
+  fetchDocumentaries: `/discover?token=${token}&userId=${userId}&genre=99`,
+  fetchSearch: `/search?token=${token}&userId=${userId}`,
 };
 
 // Hàm nạp dữ liệu
 export const fetchApi = async (url) => {
   try {
-    const response = await fetch(`https://api.themoviedb.org/3${url}`);
+    const response = await fetch(`http://localhost:5000/api/movies${url}`);
     if (!response.ok) {
       throw new Error("Something went wrong!");
     }

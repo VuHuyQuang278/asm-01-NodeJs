@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, Fragment } from "react";
 
 // Nhập hàm fetchApi và object requests
-import { fetchApi, requests } from "../../../../api/request";
+import { requests } from "../../../../api/request";
 
 // Nhập module css
 import classes from "./Banner.module.css";
@@ -13,14 +13,24 @@ const Banner = (props) => {
 
   // Sử dụng useCallback để hàm không phải chạy lại mỗi khi component được tạo lại
   const fetchData = useCallback(async () => {
-    // Lấy danh sách các bộ phim
-    const data = await fetchApi(requests.fetchNetflixOriginals);
-    // Lấy ngẫu nhiên 1 bộ phim
-    const movieInfor = await data.results[
-      Math.floor(Math.random() * data.results.length - 1)
-    ];
-    setMovie(movieInfor);
-    // console.log(movieInfor);
+    try {
+      // Lấy danh sách các bộ phim
+      const response = await fetch(
+        `https://api.themoviedb.org/3${requests.fetchNetflixOriginals}`
+      );
+      if (!response.ok) {
+        throw new Error("Something went wrong!");
+      }
+      const data = await response.json();
+
+      // Lấy ngẫu nhiên 1 bộ phim
+      const movieInfor = await data.results[
+        Math.floor(Math.random() * data.results.length - 1)
+      ];
+      setMovie(movieInfor);
+    } catch (error) {
+      console.log(error.message);
+    }
   }, []);
 
   // Dùng useEffect để chạy hàm

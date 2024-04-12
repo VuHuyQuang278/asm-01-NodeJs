@@ -74,3 +74,21 @@
   border-color: #ccc;
   cursor: not-allowed;
 }
+
+.advanced-search {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-bottom: 2rem;
+}
+
+.select {
+  font-size: 16px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  width: 120%;
+  background-color: #f7f7f7;
+  color: #333;
+}

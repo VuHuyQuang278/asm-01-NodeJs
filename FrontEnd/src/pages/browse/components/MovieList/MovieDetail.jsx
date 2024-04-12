@@ -53,7 +53,10 @@ const MovieDetail = (props) => {
         </h3>
         <hr />
         <h5 className={classes["release-date"]}>
-          Release Date: {props.movie.release_date}
+          Release Date:{" "}
+          {props.movie.release_date
+            ? props.movie.release_date
+            : props.movie.first_air_date}
         </h5>
         <h5 className={classes.vote}>Vote: {props.movie.vote_average}/10</h5>
         <p>{props.movie.overview}</p>

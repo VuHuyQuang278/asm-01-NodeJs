@@ -177,6 +177,11 @@ exports.getMovieTrailer = (req, res, next) => {
 exports.Searchmovies = (req, res, next) => {
   const keyword = req.body.keyword.toLowerCase();
 
+  const genre = req.body.genre;
+  const mediaType = req.body.mediaType;
+  const language = req.body.language;
+  const year = req.body.year;
+
   // Nếu người dùng không có param
   if (!req.body.keyword) {
     // Trả về status code của respone
@@ -187,7 +192,7 @@ exports.Searchmovies = (req, res, next) => {
 
   Movie.fetchAll((movies) => {
     // tìm kiếm overview hoặc title có chứa từ khóa, không phân biệt hoa thường
-    const moviesResult = movies.filter((movie) => {
+    let moviesResult = movies.filter((movie) => {
       // Nếu tên phim là trường title
       if (movie.title) {
         const lowerTitle = movie.title.toLowerCase();
@@ -204,6 +209,54 @@ exports.Searchmovies = (req, res, next) => {
         return lowerTitle.includes(keyword) || lowerOverview.includes(keyword);
       }
     });
+
+    // Nếu có tham số genre
+    if (genre !== "genre") {
+      moviesResult = moviesResult.filter((movie) =>
+        movie.genre_ids.includes(parseInt(genre))
+      );
+    }
+
+    // Nếu có tham số mediaType
+    if (mediaType !== "mediaType") {
+      moviesResult = moviesResult.filter(
+        (movie) => movie.media_type === mediaType
+      );
+    }
+
+    // Nếu có tham số language
+    if (language !== "language") {
+      moviesResult = moviesResult.filter(
+        (movie) => movie.original_language === language
+      );
+    }
+
+    // Nếu có tham số year
+    if (year !== "year") {
+      moviesResult = moviesResult.filter((movie) => {
+        // Nếu năm phát hành là trường release_date
+        if (movie.release_date) {
+          const time = new Date(movie.release_date);
+          const yearTime = time.getFullYear().toString();
+
+          return yearTime === year;
+        }
+
+        // Nếu năm phát hành là trường first_air_date
+        if (movie.first_air_date) {
+          const time = new Date(movie.first_air_date);
+          const yearTime = time.getFullYear().toString();
+
+          return yearTime === year;
+        }
+      });
+    }
+
+    // if (moviesResult.length === 0) {
+    //   return res.status(404).send({
+    //     message: "Not found movies",
+    //   });
+    // }
 
     // Lấy danh sách cách phim thoả mãn và tổng số page dữ liệu có thể lấy
     const { moviesModified, total_page } = updateData(moviesResult, 1);
